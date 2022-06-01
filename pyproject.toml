@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "mysql_compressed_fields"
+version = "1.0.0"
+description = "A large text field, stored compressed in the database, for Django and MySQL."
+authors = ["David Foster <david.foster@techsmart.codes>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

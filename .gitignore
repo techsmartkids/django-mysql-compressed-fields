@@ -1,5 +1,8 @@
 # Python
 *.pyc
 
+# Poetry
+dist
+
 # macOS
 .DS_Store
