@@ -23,7 +23,7 @@ database CPU resources.
 
 ### License
 
-MIT
+[MIT](LICENSE)
 
 ### Sponsor
 
