@@ -13,10 +13,8 @@ database CPU resources.
 
 ### Dependencies
 
-* [Django] 1.8 or later required
-    * Django 3.2 or later recommended
-* [MySQL] 5.6 or later required
-    * MySQL 5.7 or later recommended
+* [Django] 3.2 or later required
+* [MySQL] 5.7 or later required
 
 [Django]: https://www.djangoproject.com/
 [MySQL]: https://www.mysql.com/
