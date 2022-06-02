@@ -44,8 +44,8 @@ python-versions = ">=3.5"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "7f6a982f2cf0a1eb155190e7571172e5762794c44df57f050f7d899f46dc96c8"
+python-versions = ">=3.9,<4.0"
+content-hash = "b5dc3818c66253aedfe7affa6fc86317df4e594a4f5363b56d87046c4f089dfd"
 
 [metadata.files]
 asgiref = [
