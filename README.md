@@ -133,3 +133,19 @@ If `stop_if_greater_than` is specified and a result greater than
 `stop_if_greater_than` is returned then the compressed length is
 no less than the returned result.
 
+## Running Tests
+
+* Install [Docker].
+* Install MySQL CLI tools:
+    * If macOS, install using brew: `brew install mysql-client@5.7`
+    * Otherwise install from source: https://downloads.mysql.com/archives/community/
+* Add MySQL CLI tools to path:
+    * `export PATH="/usr/local/opt/mysql-client@5.7/bin:$PATH"`
+* Start MySQL server:
+    * `docker run --name ide_db_server -e MYSQL_DATABASE=ide_db -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:3306:3306 -d mysql:5.7`
+* Run tests:
+    * `cd tests/test_data/mysite`
+    * `poetry install`
+    * `poetry run python3 manage.py test`
+
+[Docker]: https://www.docker.com/

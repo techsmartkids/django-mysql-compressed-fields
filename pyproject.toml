@@ -9,6 +9,7 @@ python = ">=3.9,<4.0"
 
 [tool.poetry.dev-dependencies]
 Django = ">=3.2,<4.0"
+mysqlclient = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
