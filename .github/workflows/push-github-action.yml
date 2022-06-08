@@ -1,0 +1,45 @@
+name: push-github-action
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: [3.9, "3.10", "3.11.0-beta.3"]
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        ports: ['8889:3306']
+        env:
+          MYSQL_DATABASE: ide_db
+          MYSQL_ROOT_PASSWORD: root
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install Poetry
+        uses: Gr1N/setup-poetry@v7
+
+      - name: Display Poetry version
+        run: poetry --version
+      
+      - name: Install dependencies with Poetry
+        run: |
+          cd tests/test_data/mysite
+          poetry install
+      
+      - name: Run tests
+        run: |
+          cd tests/test_data/mysite
+          poetry run python3 manage.py test
