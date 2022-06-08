@@ -1,5 +1,5 @@
 from django.db import models
-from mysql_compressed_fields.fields import CompressedTextField
+from mysql_compressed_fields import CompressedTextField
 from typing import cast
 
 

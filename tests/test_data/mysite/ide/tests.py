@@ -4,7 +4,7 @@ from django.db import connection
 from django.db.models import F
 from django.test import TestCase
 from ide.models import ProjectTextFile
-from mysql_compressed_fields.functions import (
+from mysql_compressed_fields import (
     Compress, Uncompress, UncompressedLength, compress, compressed_length
 )
 

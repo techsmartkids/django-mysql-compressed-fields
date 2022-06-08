@@ -33,7 +33,14 @@ amazing things with computers. We use [Django] heavily.
 
 ## API Reference
 
-### Fields (`mysql_compressed_fields.fields`)
+All classes and functions below should be imported directly from 
+`mysql_compressed_fields`. For example:
+
+```python
+from mysql_compressed_fields import CompressedTextField
+```
+
+### Fields
 
 #### `CompressedTextField`
 
@@ -72,7 +79,7 @@ with F-expressions.
     TextFile.objects.filter(...).update(content=F('content'))
 
 
-### Database functions (`mysql_compressed_fields.functions`)
+### Database functions
 
 [F() expressions]: https://docs.djangoproject.com/en/4.0/ref/models/expressions/#f-expressions
 
