@@ -28,10 +28,10 @@ class CompressedTextField(models.Field):
     String-based lookups can be used with this field type.
     Such lookups will transparently decompress the field on the database server.
     
-        xml_files = TextFile.objects.filter(content__contains='<xml>')
-        xml_files = TextFile.objects.filter(content__startswith='<xml>')
-        xml_files = TextFile.objects.filter(content__endswith='</xml>')
-        empty_xml_files = TextFile.objects.filter(content__in=['', '<xml></xml>'])
+        xml_files = ProjectTextFile.objects.filter(content__contains='<xml>')
+        xml_files = ProjectTextFile.objects.filter(content__startswith='<xml>')
+        xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
+        empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
     
     Note that F-expressions that reference this field type will always refer to
     the compressed value rather than the uncompressed value. So you may need to
@@ -39,13 +39,13 @@ class CompressedTextField(models.Field):
     with F-expressions.
     
         # Copy a TextField value (in utf8 collation) to a CompressedTextField
-        TextFile.objects.filter(...).update(content=Compress(F('name')))
+        ProjectTextFile.objects.filter(...).update(content=Compress(F('name')))
         
         # Copy a CompressedTextField value to a TextField (in utf8 collation)
-        TextFile.objects.filter(...).update(name=Uncompress(F('content')))
+        ProjectTextFile.objects.filter(...).update(name=Uncompress(F('content')))
         
         # Copy a CompressedTextField value to a CompressedTextField
-        TextFile.objects.filter(...).update(content=F('content'))
+        ProjectTextFile.objects.filter(...).update(content=F('content'))
     """
     description = _('Text')
 

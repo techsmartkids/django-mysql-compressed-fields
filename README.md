@@ -8,8 +8,123 @@ Compression and decompression of field values is performed by Django rather
 than the database whenever possible, to conserve centralized 
 database CPU resources.
 
-[TextField]: https://docs.djangoproject.com/en/1.8/ref/models/fields/#textfield
-[BinaryField]: https://docs.djangoproject.com/en/1.8/ref/models/fields/#binaryfield
+[TextField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#textfield
+[BinaryField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#binaryfield
+[CharField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#charfield
+
+### Quickstart
+
+* Install this package:
+    * `pip3 install django-mysql-compressed-fields`
+* Find an existing Django model with an uncompressed [TextField] or [CharField]
+  that you want to compress. For example:
+
+```python
+from django.db import models
+
+class ProjectTextFile(models.Model):
+    content = models.CharField(blank=True)
+```
+
+* Add a `*_compressed` sibling field that will be used to hold the compressed
+  version of the original field. Mark it as `default=''`. Include an explicit
+  `db_column=...` value:
+
+```python
+from django.db import models
+from mysql_compressed_fields import CompressedTextField
+
+class ProjectTextFile(models.Model):
+    content = models.CharField(blank=True)
+    content_compressed = CompressedTextField(
+        blank=True,
+        default='',  # populate when field added
+        db_column='content_compressed',  # pin column name
+    )
+```
+
+* Generate a migration to add the field:
+    * `python3 manage.py makemigrations`
+* Generate a new empty migration in the same app where the field is defined,
+  which we will use to populate the compressed field:
+    * `python3 manage.py makemigrations --empty __APP_NAME__`
+* Open the empty migration file. It should look something like:
+
+```python
+from django.db import migrations
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ('ide', '0002_projecttextfile_content_compressed'),
+    ]
+
+    operations = [
+    ]
+```
+
+* Edit the migration field to use a RunPython step to populate
+  the compressed field from the uncompressed field:
+
+```python
+from django.db import migrations
+from django.db.models import F
+from mysql_compressed_fields import Compress
+
+def _populate_content_compressed(apps, schema_editor):
+    ProjectTextFile = apps.get_model('ide', 'ProjectTextFile')
+    ProjectTextFile.objects.update(content_compressed=Compress(F('content')))
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ('ide', '0002_projecttextfile_content_compressed'),
+    ]
+
+    operations = [
+        migrations.RunPython(
+            code=_populate_content_compressed,
+            reverse_code=migrations.RunPython.noop,
+            atomic=False,
+        )
+    ]
+```
+
+* Remove the original uncompressed field from the model,
+  leaving only the compressed field remaining:
+  
+
+```python
+from django.db import models
+from mysql_compressed_fields import CompressedTextField
+
+class ProjectTextFile(models.Model):
+    content_compressed = CompressedTextField(
+        blank=True,
+        default='',  # populate when field added
+        db_column='content_compressed',  # pin column name
+    )
+```
+
+* Generate a migration to remove the field:
+    * `python3 manage.py makemigrations`
+* Rename the compressed field without the `*_compressed` suffix
+  so that it now has the name of the original uncompressed field:
+
+```python
+from django.db import models
+from mysql_compressed_fields import CompressedTextField
+
+class ProjectTextFile(models.Model):
+    content = CompressedTextField(
+        blank=True,
+        default='',  # populate when field added
+        db_column='content_compressed',  # pin column name
+    )
+```
+
+* Generate a migration to rename the field:
+    * `python3 manage.py makemigrations`
+    * When prompted whether the field was renamed, answer `y` (for yes).
+* You now have a compressed version of the original field. All done! 🎉
 
 ### Dependencies
 
@@ -59,10 +174,10 @@ length of the uncompressed text rather than the compressed text.
 String-based lookups can be used with this field type.
 Such lookups will transparently decompress the field on the database server.
 
-    xml_files = TextFile.objects.filter(content__contains='<xml>')
-    xml_files = TextFile.objects.filter(content__startswith='<xml>')
-    xml_files = TextFile.objects.filter(content__endswith='</xml>')
-    empty_xml_files = TextFile.objects.filter(content__in=['', '<xml></xml>'])
+    xml_files = ProjectTextFile.objects.filter(content__contains='<xml>')
+    xml_files = ProjectTextFile.objects.filter(content__startswith='<xml>')
+    xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
+    empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
 
 Note that F-expressions that reference this field type will always refer to
 the compressed value rather than the uncompressed value. So you may need to
@@ -70,13 +185,13 @@ use the Compress() and Uncompress() database functions manually when working
 with F-expressions.
 
     # Copy a TextField value (in utf8 collation) to a CompressedTextField
-    TextFile.objects.filter(...).update(content=Compress(F('name')))
+    ProjectTextFile.objects.filter(...).update(content=Compress(F('name')))
     
     # Copy a CompressedTextField value to a TextField (in utf8 collation)
-    TextFile.objects.filter(...).update(name=Uncompress(F('content')))
+    ProjectTextFile.objects.filter(...).update(name=Uncompress(F('content')))
     
     # Copy a CompressedTextField value to a CompressedTextField
-    TextFile.objects.filter(...).update(content=F('content'))
+    ProjectTextFile.objects.filter(...).update(content=F('content'))
 
 
 ### Database functions
