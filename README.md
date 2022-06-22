@@ -1,16 +1,59 @@
 # django-mysql-compressed-fields
 
-This package provides [CompressedTextField](#CompressedTextField), a
-MySQL-specific Django model field similar to [TextField] that stores its
+This package provides [CompressedTextField], a MySQL-specific
+Django model field similar to [TextField] or [CharField] that stores its
 value in compressed form.
 
-Compression and decompression of field values is performed by Django rather
-than the database whenever possible, to conserve centralized 
-database CPU resources.
+In particular you can replace a TextField or CharField like:
+
+```python
+from django.db import models
+
+class ProjectTextFile(models.Model):
+    content = models.CharField(blank=True)
+```
+
+with:
+
+```python
+from django.db import models
+from mysql_compressed_fields import CompressedTextField
+
+class ProjectTextFile(models.Model):
+    content = CompressedTextField(blank=True)
+```
+
+such that the text value of the field is actually compressed in the database.
+
+String-based lookups are supported:
+
+```python
+xml_files = ProjectTextFile.objects.filter(content__contains='<xml>')
+xml_files = ProjectTextFile.objects.filter(content__startswith='<xml>')
+xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
+empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
+```
+
+Advanced manipulation with MySQL's COMPRESS(), UNCOMPRESS(), and 
+UNCOMPRESSED_LENGTH() functions are also supported:
+
+```python
+from django.db.models import F
+from mysql_compressed_fields import UncompressedLength
+
+files = ProjectTextFile.objects.only('id').annotate(
+    content_length=UncompressedLength(F('content'))
+)
+```
+
+See the [Quickstart] to see how to migrate an existing TextField or CharField
+to be a CompressedTextField.
 
 [TextField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#textfield
 [BinaryField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#binaryfield
 [CharField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#charfield
+[CompressedTextField]: #CompressedTextField
+[Quickstart]: #Quickstart
 
 ### Quickstart
 
