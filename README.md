@@ -307,7 +307,7 @@ no less than the returned result.
 * Add MySQL CLI tools to path:
     * `export PATH="/usr/local/opt/mysql-client@5.7/bin:$PATH"`
 * Start MySQL server:
-    * `docker run --name ide_db_server -e MYSQL_DATABASE=ide_db -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:3306:3306 -d mysql:5.7`
+    * `docker run --name ide_db_server -e MYSQL_DATABASE=ide_db -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:8889:3306 -d mysql:5.7`
 * Run tests:
     * `cd tests/test_data/mysite`
     * `poetry install`
