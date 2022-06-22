@@ -184,7 +184,7 @@ class ProjectTextFile(models.Model):
 ### Sponsor
 
 This project is brought to you by [TechSmart], which seeks to inspire the
-next generation of K-12 teachers and students to learn to code and create
+next generation of K-12 teachers and students to learn coding and create
 amazing things with computers. We use [Django] heavily.
 
 [TechSmart]: https://www.techsmart.codes/
