@@ -115,6 +115,8 @@ from mysql_compressed_fields import Compress
 
 def _populate_content_compressed(apps, schema_editor):
     ProjectTextFile = apps.get_model('ide', 'ProjectTextFile')
+    # NOTE: Assumes "content" field is already UTF-8 encoded,
+    #       because CompressedTextField assumes UTF-8 encoding.
     ProjectTextFile.objects.update(content_compressed=Compress(F('content')))
 
 class Migration(migrations.Migration):
