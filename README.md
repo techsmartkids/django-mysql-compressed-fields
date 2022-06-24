@@ -34,7 +34,7 @@ xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
 empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
 ```
 
-Advanced manipulation with MySQL's COMPRESS(), UNCOMPRESS(), and 
+Advanced manipulations with MySQL's COMPRESS(), UNCOMPRESS(), and 
 UNCOMPRESSED_LENGTH() functions are also supported:
 
 ```python
@@ -86,7 +86,7 @@ class ProjectTextFile(models.Model):
     )
 ```
 
-* Generate a migration to add the field:
+* Generate a migration to add the compressed field:
     * `python3 manage.py makemigrations`
 * Generate a new empty migration in the same app where the field is defined,
   which we will use to populate the compressed field:
@@ -149,7 +149,7 @@ class ProjectTextFile(models.Model):
     )
 ```
 
-* Generate a migration to remove the field:
+* Generate a migration to remove the uncompressed field:
     * `python3 manage.py makemigrations`
 * Rename the compressed field without the `*_compressed` suffix
   so that it now has the name of the original uncompressed field:
@@ -219,24 +219,28 @@ length of the uncompressed text rather than the compressed text.
 String-based lookups can be used with this field type.
 Such lookups will transparently decompress the field on the database server.
 
-    xml_files = ProjectTextFile.objects.filter(content__contains='<xml>')
-    xml_files = ProjectTextFile.objects.filter(content__startswith='<xml>')
-    xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
-    empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
+```python
+xml_files = ProjectTextFile.objects.filter(content__contains='<xml>')
+xml_files = ProjectTextFile.objects.filter(content__startswith='<xml>')
+xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
+empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
+```
 
 Note that F-expressions that reference this field type will always refer to
 the compressed value rather than the uncompressed value. So you may need to
 use the Compress() and Uncompress() database functions manually when working
 with F-expressions.
 
-    # Copy a TextField value (in utf8 collation) to a CompressedTextField
-    ProjectTextFile.objects.filter(...).update(content=Compress(F('name')))
-    
-    # Copy a CompressedTextField value to a TextField (in utf8 collation)
-    ProjectTextFile.objects.filter(...).update(name=Uncompress(F('content')))
-    
-    # Copy a CompressedTextField value to a CompressedTextField
-    ProjectTextFile.objects.filter(...).update(content=F('content'))
+```python
+# Copy a TextField value (in utf8 collation) to a CompressedTextField
+ProjectTextFile.objects.filter(...).update(content=Compress(F('name')))
+
+# Copy a CompressedTextField value to a TextField (in utf8 collation)
+ProjectTextFile.objects.filter(...).update(name=Uncompress(F('content')))
+
+# Copy a CompressedTextField value to a CompressedTextField
+ProjectTextFile.objects.filter(...).update(content=F('content'))
+```
 
 
 ### Database functions
