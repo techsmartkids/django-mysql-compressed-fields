@@ -2,7 +2,7 @@
 
 This package provides [CompressedTextField], a MySQL-specific
 Django model field similar to [TextField] or [CharField] that stores its
-value in compressed form.
+value in compressed form via [zlib].
 
 In particular you can replace a TextField or CharField like:
 
@@ -10,7 +10,7 @@ In particular you can replace a TextField or CharField like:
 from django.db import models
 
 class ProjectTextFile(models.Model):
-    content = models.CharField(blank=True)
+    content = models.TextField(blank=True)
 ```
 
 with:
@@ -34,8 +34,8 @@ xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
 empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
 ```
 
-Advanced manipulations with MySQL's COMPRESS(), UNCOMPRESS(), and 
-UNCOMPRESSED_LENGTH() functions are also supported:
+Advanced manipulations with MySQL's [COMPRESS()], [UNCOMPRESS()], and 
+[UNCOMPRESSED_LENGTH()] functions are also supported:
 
 ```python
 from django.db.models import F
@@ -46,16 +46,28 @@ files = ProjectTextFile.objects.only('id').annotate(
 )
 ```
 
-See the [Quickstart] to see how to migrate an existing TextField or CharField
-to be a CompressedTextField.
-
 [TextField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#textfield
 [BinaryField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#binaryfield
 [CharField]: https://docs.djangoproject.com/en/3.2/ref/models/fields/#charfield
 [CompressedTextField]: #CompressedTextField
-[Quickstart]: #Quickstart
+[zlib]: https://docs.python.org/3/library/zlib.html
 
-### Quickstart
+### Dependencies
+
+* [Django] 3.2 or later required
+* [MySQL] 5.7 or later required
+* ...and nothing else 🎉
+
+[Django]: https://www.djangoproject.com/
+[MySQL]: https://www.mysql.com/
+
+### License
+
+[MIT](LICENSE)
+
+### Migration Steps
+
+To migrate an existing TextField or CharField to be a CompressedTextField:
 
 * Install this package:
     * `pip3 install django-mysql-compressed-fields`
@@ -66,7 +78,7 @@ to be a CompressedTextField.
 from django.db import models
 
 class ProjectTextFile(models.Model):
-    content = models.CharField(blank=True)
+    content = models.TextField(blank=True)
 ```
 
 * Add a `*_compressed` sibling field that will be used to hold the compressed
@@ -78,10 +90,10 @@ from django.db import models
 from mysql_compressed_fields import CompressedTextField
 
 class ProjectTextFile(models.Model):
-    content = models.CharField(blank=True)
+    content = models.TextField(blank=True)
     content_compressed = CompressedTextField(
         blank=True,
-        default='',  # populate when field added
+        default='',  # needed by Django when adding a field
         db_column='content_compressed',  # pin column name
     )
 ```
@@ -105,7 +117,7 @@ class Migration(migrations.Migration):
     ]
 ```
 
-* Edit the migration field to use a RunPython step to populate
+* Edit the `operations` field to use a RunPython step to populate
   the compressed field from the uncompressed field:
 
 ```python
@@ -144,7 +156,7 @@ from mysql_compressed_fields import CompressedTextField
 class ProjectTextFile(models.Model):
     content_compressed = CompressedTextField(
         blank=True,
-        default='',  # populate when field added
+        default='',  # needed by Django when adding a field
         db_column='content_compressed',  # pin column name
     )
 ```
@@ -161,7 +173,7 @@ from mysql_compressed_fields import CompressedTextField
 class ProjectTextFile(models.Model):
     content = CompressedTextField(
         blank=True,
-        default='',  # populate when field added
+        default='',  # needed by Django when adding a field
         db_column='content_compressed',  # pin column name
     )
 ```
@@ -171,23 +183,11 @@ class ProjectTextFile(models.Model):
     * When prompted whether the field was renamed, answer `y` (for yes).
 * You now have a compressed version of the original field. All done! 🎉
 
-### Dependencies
-
-* [Django] 3.2 or later required
-* [MySQL] 5.7 or later required
-
-[Django]: https://www.djangoproject.com/
-[MySQL]: https://www.mysql.com/
-
-### License
-
-[MIT](LICENSE)
-
 ### Sponsor
 
 This project is brought to you by [TechSmart], which seeks to inspire the
 next generation of K-12 teachers and students to learn coding and create
-amazing things with computers. We use [Django] heavily.
+amazing things with computers. We use Django heavily.
 
 [TechSmart]: https://www.techsmart.codes/
 
@@ -242,6 +242,11 @@ ProjectTextFile.objects.filter(...).update(name=Uncompress(F('content')))
 ProjectTextFile.objects.filter(...).update(content=F('content'))
 ```
 
+The default form widget for this field is a 
+`django.contrib.admin.widgets.AdminTextareaWidget` (a kind of [TextInput]).
+
+[TextInput]: https://docs.djangoproject.com/en/3.2/ref/forms/widgets/#textinput
+
 
 ### Database functions
 
@@ -249,18 +254,21 @@ ProjectTextFile.objects.filter(...).update(content=F('content'))
 
 #### `Compress`
 
-The MySQL COMPRESS() function, usable in [F() expressions].
-See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_compress
+The MySQL [COMPRESS()] function, usable in [F() expressions].
+
+[COMPRESS()]: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_compress
 
 #### `Uncompress`
 
-The MySQL UNCOMPRESS() function, usable in [F() expressions].
-See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_uncompress
+The MySQL [UNCOMPRESS()] function, usable in [F() expressions].
+
+[UNCOMPRESS()]: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_uncompress
 
 #### `UncompressedLength`
 
-The MySQL UNCOMPRESSED_LENGTH() function, usable in [F() expressions].
-See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_uncompressed-length
+The MySQL [UNCOMPRESSED_LENGTH()] function, usable in [F() expressions].
+
+[UNCOMPRESSED_LENGTH()]: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_uncompressed-length
 
 #### `compress`
 
@@ -268,8 +276,7 @@ See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_
 def compress(uncompressed_bytes: bytes) -> bytes:
 ```
 
-The MySQL COMPRESS() function.
-See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_compress
+The MySQL [COMPRESS()] function.
 
 #### `uncompress`
 
@@ -277,8 +284,7 @@ See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_
 def uncompress(compressed_bytes: bytes) -> bytes:
 ```
 
-The MySQL UNCOMPRESS() function.
-See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_uncompress
+The MySQL [UNCOMPRESS()] function.
 
 #### `uncompressed_length`
 
@@ -286,8 +292,7 @@ See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_
 def uncompressed_length(compressed_bytes: bytes) -> int:
 ```
 
-The MySQL UNCOMPRESSED_LENGTH() function.
-See: https://dev.mysql.com/doc/refman/5.7/en/encryption-functions.html#function_uncompressed-length
+The MySQL [UNCOMPRESSED_LENGTH()] function.
 
 #### `compressed_length`
 
