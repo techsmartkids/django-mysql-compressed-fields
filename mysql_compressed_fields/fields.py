@@ -28,10 +28,10 @@ class CompressedTextField(models.Field):
     String-based lookups can be used with this field type.
     Such lookups will transparently decompress the field on the database server.
     
-        xml_files = ProjectTextFile.objects.filter(content__contains='<xml>')
-        xml_files = ProjectTextFile.objects.filter(content__startswith='<xml>')
-        xml_files = ProjectTextFile.objects.filter(content__endswith='</xml>')
-        empty_xml_files = ProjectTextFile.objects.filter(content__in=['', '<xml></xml>'])
+        html_files = ProjectTextFile.objects.filter(content__contains='<html')
+        html_files = ProjectTextFile.objects.filter(content__startswith='<!DOCTYPE')
+        html_files = ProjectTextFile.objects.filter(content__endswith='</html>')
+        empty_html_files = ProjectTextFile.objects.filter(content__in=['', '<html></html>'])
     
     Note that F-expressions that reference this field type will always refer to
     the compressed value rather than the uncompressed value. So you may need to
