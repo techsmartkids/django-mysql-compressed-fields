@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='ProjectTextFile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('relpath', models.CharField(help_text='ex: program.py', max_length=150)),
+                ('name', models.CharField(help_text='ex: program.py', max_length=150)),
                 ('content', mysql_compressed_fields.fields.CompressedTextField(blank=True, db_column='content_compressed', help_text="ex: print('Hello World!')")),
             ],
         ),

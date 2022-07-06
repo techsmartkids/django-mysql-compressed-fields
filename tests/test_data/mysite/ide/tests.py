@@ -139,19 +139,19 @@ class CompressedTextFieldLookupTests(TestCase):
 class CompressionFuncTests(TestCase):
     def setUp(self):
         self.ptf = _create_project_text_file()
-        self.ptf.relpath = 'abc'
+        self.ptf.name = 'abc'
         self.ptf.content = 'def'
         self.ptf.save()
     
     def test_can_bulk_copy_compressed_field_to_uncompressed(self):
         ProjectTextFile.objects.filter(id=self.ptf.id).update(
-            relpath=Uncompress(F('content')))
+            name=Uncompress(F('content')))
         self.ptf = ProjectTextFile.objects.get(id=self.ptf.id)
-        self.assertEqual('def', self.ptf.relpath)
+        self.assertEqual('def', self.ptf.name)
     
     def test_can_bulk_copy_uncompressed_field_to_compressed(self):
         ProjectTextFile.objects.filter(id=self.ptf.id).update(
-            content=Compress(F('relpath')))
+            content=Compress(F('name')))
         self.ptf = ProjectTextFile.objects.get(id=self.ptf.id)
         self.assertEqual('abc', self.ptf.content)
     
@@ -163,9 +163,9 @@ class CompressionFuncTests(TestCase):
     
     def test_can_get_uncompressed_length_of_field(self):
         ProjectTextFile.objects.filter(id=self.ptf.id).update(
-            relpath=UncompressedLength(F('content')))
+            name=UncompressedLength(F('content')))
         self.ptf = ProjectTextFile.objects.get(id=self.ptf.id)
-        self.assertEqual('3', self.ptf.relpath)
+        self.assertEqual('3', self.ptf.name)
     
     def test_can_get_compressed_length_of_value(self):
         for uncompressed_python_value in CompressedTextFieldTests.UNCOMPRESSED_PYTHON_VALUES:
@@ -177,4 +177,4 @@ class CompressionFuncTests(TestCase):
 
 
 def _create_project_text_file():
-    return ProjectTextFile(relpath='ignored')
+    return ProjectTextFile(name='ignored')

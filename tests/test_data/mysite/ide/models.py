@@ -3,10 +3,9 @@ from mysql_compressed_fields import CompressedTextField
 from typing import cast
 
 
-# TODO: Rename before release -> TextFile
 class ProjectTextFile(models.Model):
     # TODO: Rename before release -> name
-    relpath = cast(str, models.CharField(
+    name = cast(str, models.CharField(
         max_length=150,
         help_text='ex: program.py',
     ))
