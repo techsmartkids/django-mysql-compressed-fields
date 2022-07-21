@@ -1,5 +1,7 @@
 # django-mysql-compressed-fields
 
+<img src="https://raw.githubusercontent.com/techsmartkids/django-mysql-compressed-fields/main/README/logo.svg" title="django-mysql-compressed-fields logo" width="128" height="128" align="right" />
+
 This package provides [CompressedTextField], a MySQL-specific
 Django model field similar to [TextField] or [CharField] that stores its
 value in compressed form via [zlib].
