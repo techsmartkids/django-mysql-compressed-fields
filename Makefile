@@ -18,7 +18,7 @@ test:  ## Run the tests.
 
 
 .PHONY: publish
-publish: testall  ## Publish the package to PyPI.
+publish: test  ## Publish the package to PyPI.
 	poetry build && \
 	git tag v$$(cat pyproject.toml | grep "# publish: version" | sed 's/[^0-9.]*//g') && \
 	\
