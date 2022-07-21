@@ -13,6 +13,7 @@ help:  ## Show this help message.
 .PHONY: test
 test:  ## Run the tests.
 	poetry install
+	docker start ide_db_server || docker run --name ide_db_server -e MYSQL_DATABASE=ide_db -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:8889:3306 -d mysql:5.7
 	( cd tests/test_data/mysite ; poetry run python3 manage.py test )
 
 
