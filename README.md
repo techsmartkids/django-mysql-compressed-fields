@@ -327,3 +327,13 @@ no less than the returned result.
     * `poetry run python3 manage.py test`
 
 [Docker]: https://www.docker.com/
+
+## Release Notes
+
+### v1.0.1
+
+* Add logo.
+
+### v1.0.0
+
+* Initial release.
