@@ -330,6 +330,10 @@ no less than the returned result.
 
 ## Release Notes
 
+### v1.1.0
+
+* Fix to support Django 4.1
+
 ### v1.0.1
 
 * Add logo.

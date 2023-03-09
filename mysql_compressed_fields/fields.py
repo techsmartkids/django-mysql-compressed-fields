@@ -3,8 +3,15 @@ from django import forms
 from django.contrib import admin
 from django.db import IntegrityError, models
 from django.db.models import Func, Lookup, lookups
-from django.utils.encoding import smart_text, force_bytes
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_bytes
+try:
+    from django.utils.encoding import smart_str as smart_text
+except ImportError:
+    from django.utils.encoding import smart_text
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext_lazy as _
 from mysql_compressed_fields.functions import compress, uncompress
 
 
