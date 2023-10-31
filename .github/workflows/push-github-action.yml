@@ -6,11 +6,11 @@ jobs:
     
     strategy:
       matrix:
-        python-version: [3.9, "3.10", "3.11.0-beta.3"]
+        python-version: [3.9, "3.10", "3.11", "3.12"]
     
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         ports: ['8889:3306']
         env:
           MYSQL_DATABASE: ide_db

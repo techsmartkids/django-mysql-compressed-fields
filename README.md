@@ -322,12 +322,12 @@ no less than the returned result.
 
 * Install [Docker].
 * Install MySQL CLI tools:
-    * If macOS, install using brew: `brew install mysql-client@5.7`
+    * If macOS, install using brew: `brew install mysql-client@8.0`
     * Otherwise install from source: https://downloads.mysql.com/archives/community/
 * Add MySQL CLI tools to path:
-    * `export PATH="/usr/local/opt/mysql-client@5.7/bin:$PATH"`
+    * `export PATH="/usr/local/opt/mysql-client@8.0/bin:$PATH"`
 * Start MySQL server:
-    * `docker run --name ide_db_server -e MYSQL_DATABASE=ide_db -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:8889:3306 -d mysql:5.7`
+    * `docker run --name ide_db_server -e MYSQL_DATABASE=ide_db -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:8889:3306 -d mysql:8.0`
 * Run tests:
     * `cd tests/test_data/mysite`
     * `poetry install`
