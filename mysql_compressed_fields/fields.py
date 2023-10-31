@@ -27,6 +27,15 @@ class CompressedTextField(models.Field):
     same format that MySQL's COMPRESS() function uses. Compression and
     decompression is performed by Django and not the database.
     
+    encode_errors controls how encoding errors are handled when saving the field.
+    decode_errors controls how decoding errors are handled when loading the field.
+    If 'strict' (the default), a UnicodeError exception is raised. 
+    Other possible values are 'ignore', 'replace', and any other name 
+    registered via [codecs.register_error()]. See [Error Handlers] for details.
+    
+    [codecs.register_error()]: https://docs.python.org/3/library/codecs.html#codecs.register_error
+    [Error Handlers]: https://docs.python.org/3/library/codecs.html#error-handlers
+    
     If you specify a max_length attribute, it will be reflected in the
     Textarea widget of the auto-generated form field. However it is not
     enforced at the model or database level. The max_length applies to the
@@ -55,6 +64,16 @@ class CompressedTextField(models.Field):
         ProjectTextFile.objects.filter(...).update(content=F('content'))
     """
     description = _('Text')
+    
+    def __init__(self,
+            *args,
+            encode_errors=None,
+            decode_errors=None,
+            **kwargs
+            ) -> None:
+        super().__init__(*args, **kwargs)
+        self._encode_errors = encode_errors
+        self._decode_errors = decode_errors
 
     # Define database column type
     def get_internal_type(self):
@@ -85,7 +104,7 @@ class CompressedTextField(models.Field):
             else:
                 if not isinstance(value, str):
                     value = smart_text(value)  # reinterpret
-                database_value = compress(value.encode('utf8'))
+                database_value = compress(value.encode('utf8', errors=self._encode_errors or 'strict'))
                 return connection.Database.Binary(database_value)
     
     # Convert database value -> Python value
@@ -93,7 +112,7 @@ class CompressedTextField(models.Field):
         if database_value is None:
             return None
         value_bytes = uncompress(database_value)
-        value = value_bytes.decode('utf8')
+        value = value_bytes.decode('utf8', errors=self._decode_errors or 'strict')
         return value
     
     # Convert Python value of self -> serialized value
@@ -103,6 +122,15 @@ class CompressedTextField(models.Field):
     # Convert {uncleaned form value, serialized value} -> Python value
     def to_python(self, form_or_serialized_value):
         return form_or_serialized_value
+
+    # Define how field is serialized in migration files
+    def deconstruct(self):
+        (name, path, args, kwargs) = super().deconstruct()
+        if self._encode_errors is not None:
+            kwargs['encode_errors'] = self._encode_errors
+        if self._decode_errors is not None:
+            kwargs['decode_errors'] = self._decode_errors
+        return (name, path, args, kwargs)
     
     # Define default form field
     def formfield(self, **kwargs):

@@ -206,16 +206,23 @@ from mysql_compressed_fields import CompressedTextField
 
 #### `CompressedTextField`
 
+<h5><code><i>class</i> CompressedTextField(<i>encode_errors='strict', decode_errors='strict', **options</i>)</code></h5>
+
 A large text field, stored compressed in the database.
 
 Generally behaves like [TextField]. Stores values in the database using the
 same database column type as [BinaryField]. The value is compressed in the
-same format that MySQL's COMPRESS() function uses. Compression and
+same format that MySQL's [COMPRESS()] function uses. Compression and
 decompression is performed by Django and not the database.
 
-If you specify a max_length attribute, it will be reflected in the
+`encode_errors` controls how encoding errors are handled when saving the field. `decode_errors` controls how decoding errors are handled when loading the field. If `'strict'` (the default), a UnicodeError exception is raised. Other possible values are `'ignore'`, `'replace'`, and any other name registered via [codecs.register_error()]. See [Error Handlers] for details.
+
+[codecs.register_error()]: https://docs.python.org/3/library/codecs.html#codecs.register_error
+[Error Handlers]: https://docs.python.org/3/library/codecs.html#error-handlers
+
+If you specify a `max_length` attribute, it will be reflected in the
 Textarea widget of the auto-generated form field. However it is not
-enforced at the model or database level. The max_length applies to the
+enforced at the model or database level. The `max_length` applies to the
 length of the uncompressed text rather than the compressed text.
 
 String-based lookups can be used with this field type.
@@ -330,9 +337,13 @@ no less than the returned result.
 
 ## Release Notes
 
+### v1.2.0
+
+* Add the `encode_errors` and `decode_errors` options to `CompressedTextField`.
+
 ### v1.1.0
 
-* Fix to support Django 4.1
+* Fix to support Django 4.1.
 
 ### v1.0.1
 
