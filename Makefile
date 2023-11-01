@@ -20,7 +20,7 @@ test:  ## Run the tests.
 .PHONY: publish
 publish: test  ## Publish the package to PyPI.
 	poetry build && \
-	git tag v$$(cat pyproject.toml | grep "# publish: version" | sed 's/[^0-9.]*//g') && \
-	\
 	poetry publish && \
+	\
+	git tag v$$(cat pyproject.toml | grep "# publish: version" | sed 's/[^0-9.]*//g') && \
 	git push origin --tags
